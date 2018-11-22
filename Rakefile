@@ -37,3 +37,11 @@ desc "run test suite"
 task :test => :bin do
     sh "build/test-qlib"
 end
+
+
+directory "build/docs"
+
+desc "build doxygen docs"
+task :docs => "build/docs" do
+    sh "doxygen"
+end
