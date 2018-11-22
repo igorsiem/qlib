@@ -10,8 +10,6 @@
 
 # TODO Windows support
 
-# TODO build docs using doxygen
-
 directory "build"
 
 desc "clean all build artefacts"

@@ -33,3 +33,4 @@
 
 # Cmake artefacts
 build/
+.vscode/

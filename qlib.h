@@ -9,6 +9,8 @@
  * or copy at https://www.boost.org/LICENSE_1_0.txt
  */
 
+#include "default_decs.h"
+#include "logger.h"
 #include "strutils.h"
 
 /**
