@@ -182,7 +182,7 @@
  * \param classname The name of the class
  */
 #define DECLARE_DEFAULT_MOVE_AND_COPY_SEMANTICS( classname ) \
-    DECLARE_DEFAULT_COPY_SEMANTICS(classsname) \
+    DECLARE_DEFAULT_COPY_SEMANTICS(classname) \
     DECLARE_DEFAULT_MOVE_SEMANTICS(classname);
 
 /**
@@ -192,7 +192,7 @@
  * \param classname The name of the class
  */
 #define DECLARE_NO_MOVE_AND_COPY_SEMANTICS( classname ) \
-    DECLARE_NO_COPY_SEMANTICS(classsname) \
+    DECLARE_NO_COPY_SEMANTICS(classname) \
     DECLARE_NO_MOVE_SEMANTICS(classname);
 
 /**
