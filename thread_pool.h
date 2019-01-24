@@ -51,7 +51,7 @@ class thread_pool final
      * (defaults to the available hardware concurrency)
      */
     explicit thread_pool(
-            std::size_t num_threads = std::thread::harware_concurrency()) :
+            std::size_t num_threads = std::thread::hardware_concurrency()) :
         m_workers()
         , m_tasks()
         , m_tasks_mtx()
@@ -80,7 +80,7 @@ class thread_pool final
                                 return m_stop || (!this->m_tasks.empty());
                             });
 
-                        if (m_stop && tasks.empty()) return;
+                        if (m_stop && m_tasks.empty()) return;
 
                         task = std::move(m_tasks.front());
                         m_tasks.pop();
@@ -90,7 +90,7 @@ class thread_pool final
                         task();
                     }   // end infinite loop
                 });
-                
+
     }   // end constructor
 
     /**
@@ -142,7 +142,7 @@ class thread_pool final
             throw std::runtime_error(
                 "attempt to enqueue on stopped thread pool");
 
-        tasks.emplace([task](void){ (*task)(); });
+        m_tasks.emplace([task](void){ (*task)(); });
 
         tasks_lck.unlock();
 

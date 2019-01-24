@@ -1,5 +1,5 @@
 /**
- * \file test-strutils.cpp
+ * \file strutils-test.cpp
  * Test string utilities
  * 
  * \author Igor Siemienowicz
