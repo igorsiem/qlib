@@ -1,5 +1,5 @@
 /**
- * \file test-logger.cpp
+ * \file logger-test.cpp
  * Test logger class utilities
  * 
  * \author Igor Siemienowicz
