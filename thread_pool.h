@@ -30,10 +30,53 @@ namespace qlib {
  * \brief A simple worker thread pool implementation, written using pure
  * standard C++
  *
+ * This class implements a lightweight worker thread pool, using std::thread.
+ * Tasks may be any callable object (lambda, or whatever), and are passed to
+ * the `enqueue` method, which packages them as tasks, and places them on the
+ * internal execution queue, and yields a `std::future` object, which can be
+ * used to access the result.
+ *
+ * Internally, worker threads sleep until a task is enqueued, upon which,
+ * one thread awakens to process thet ask. The thread pool destructor awakens
+ * all the threads and joins them before exiting.
+ *
  * This work is based on Jakob Progsch's excellent example, which may be
  * found at https://github.com/progschj/ThreadPool.
  *
- * \todo Add basic usage example
+ * \par Example Usage
+ *
+ * \code
+ * qlib::thread_pool tp;    // Number of threads equal to hardware
+ *                          // concurrrency
+ *
+ * // Put some tasks in the queue for the thread pool to execute
+ * // The first one sets an external falg
+ * bool test_flag = false;
+ * auto result1 = tp.enqueue([&test_flag]() { test_flag = true; });
+ *
+ * // The second task takes no arguments, but returns a result
+ * auto result2 = tp.enqueue([]() { return std::string("abc"); });
+ *
+ * // This task uses a predefined lambda that adds two integers. Note that
+ * // the call to enqueue the task takes the arguments as well.
+ * auto my_fn = [](int a, int b) { return a+b; };
+ * auto result3 = tp.enqueue(my_fn, 2, 3);
+ *
+ * // This task throws an exception!
+ * auto result4 = tp.enqueue([]() { throw std::runtime_error("test"); });
+ *
+ * // Four tasks now being executed...
+ *
+ * result1.get();
+ * // test_flag is now true
+ *
+ * // Prints "abc - 5" to the console
+ * std::cout << result2.get() << " - " << result3.get() << std::endl;
+ *
+ * // This line re-throws the std::runtime_error that was thrown in the
+ * // task.
+ * result4.get();
+ * \endcode
  */
 class thread_pool final
 {
@@ -122,6 +165,9 @@ class thread_pool final
      * \param fn The callable object to enqueued
      *
      * \param args The arguments to the enqueued function
+     *
+     * \return A `std::future` object that can be used to obtain the
+     * result of `fn`, or access any exception thrown
      */
     template <typename F, typename... Args>
     auto enqueue(F&& fn, Args&&... args)

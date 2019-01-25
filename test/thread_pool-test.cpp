@@ -16,21 +16,45 @@
 // types, and then checking the results
 TEST_CASE("thread_pool", "[unit]")
 {
-    qlib::thread_pool pool;
+    qlib::thread_pool tp;
 
-    // Enqueue some tasks to be executed in parallel
-    bool test_flag = false;
-    auto r1 = pool.enqueue([&test_flag](void) { test_flag = true; });
+    // verify regular parallel execution
+    SECTION("parallel execution")
+    {
+        // Enqueue some tasks to be executed in parallel
+        bool test_flag = false;
+        auto r1 = tp.enqueue([&test_flag](void) { test_flag = true; });
 
-    // task that returns a result
-    auto r2 = pool.enqueue([](void) { return std::string("abc"); });
+        // task that returns a result
+        auto r2 = tp.enqueue([](void) { return std::string("abc"); });
 
-    // task that takes arguments, and returns a result
-    auto r3 = pool.enqueue([](int a, int b) { return a+b; }, 2, 3);
+        // task that takes arguments, and returns a result
+        auto my_fn = [](int a, int b) { return a+b; };
+        auto r3 = tp.enqueue(my_fn, 2, 3);
 
-    // Check the results from the futures we got before
-    r1.get();
-    REQUIRE(test_flag == true);
-    REQUIRE(r2.get() == "abc");
-    REQUIRE(r3.get() == 5);
+        // All futures are valid
+        REQUIRE(r1.valid());
+        REQUIRE(r2.valid());
+        REQUIRE(r3.valid());
+
+        // Check the results from the futures we got before
+        r1.get();
+        REQUIRE(test_flag == true);
+        REQUIRE(r2.get() == "abc");
+        REQUIRE(r3.get() == 5);
+    }   // end parallel execution section
+
+    // Test exception handling in tasks
+    SECTION("exceptions")
+    {
+        auto result = tp.enqueue([](void)
+            {
+                throw std::runtime_error("test");
+            });
+
+        REQUIRE(result.valid());
+        REQUIRE_NOTHROW(result.wait());
+        REQUIRE_THROWS_AS(result.get(), std::runtime_error);
+    }
+
 }   // end thread pool test
