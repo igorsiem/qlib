@@ -16,10 +16,10 @@
 #include <mutex>
 #include <queue>
 #include <stdexcept>
-#include <thread>
 #include <vector>
 
 #include "default_decs.h"
+#include "thread.h"
 
 #ifndef _qlib_thread_pool_h_included
 #define _qlib_thread_pool_h_included
@@ -115,7 +115,7 @@ class thread_pool final
 
                         // Wait until there is a task, or 'stop' has been
                         // raised.
-                        std::unique_lock<std::mutex> tasks_lck(m_tasks_mtx);
+                        lock tasks_lck(m_tasks_mtx);
                         m_tasks_cv.wait(
                             tasks_lck
                             , [this](void)
@@ -143,7 +143,7 @@ class thread_pool final
      */
     ~thread_pool(void)
     {
-        std::unique_lock<std::mutex> tasks_lck(m_tasks_mtx);
+        lock tasks_lck(m_tasks_mtx);
         m_stop = true;
         tasks_lck.unlock();
 
@@ -179,10 +179,10 @@ class thread_pool final
         auto task = std::make_shared<std::packaged_task<return_t(void)> >(
             std::bind(std::forward<F>(fn), std::forward<Args>(args)...));
 
-        std::future<return_t> result = task->get_future();
+        future<return_t> result = task->get_future();
 
         // Place the task in the queue and notify a sleeping thread
-        std::unique_lock<std::mutex> tasks_lck(m_tasks_mtx);
+        lock tasks_lck(m_tasks_mtx);
 
         if (m_stop)
             throw std::runtime_error(
@@ -211,12 +211,12 @@ class thread_pool final
     /**
      * \brief Mutex for synchronising task queue access
      */
-    std::mutex m_tasks_mtx;
+    mutex m_tasks_mtx;
 
     /**
      * \brief Condition variable for monitoring tasks queue status
      */
-    std::condition_variable m_tasks_cv;
+    condition_variable m_tasks_cv;
 
     /**
      * \brief Flag to signal that thread pool is being shut down
