@@ -9,6 +9,7 @@
  * or copy at https://www.boost.org/LICENSE_1_0.txt
  */
 
+#include <future>
 #include <shared_mutex>
 
 #ifndef _qlib_thread_h_included
@@ -48,8 +49,20 @@ using condition_variable = std::condition_variable;
 
 /**
  * \brief Asynchronous future type used by qLib
+ *
+ * \tparam The return type of the future (returned by the `get` method)
  */
-template <class T> using future = std::future<T>;
+template <typename T> using future = std::future<T>;
+
+/**
+ * \brief Packaged task type used by qLib
+ *
+ * \tparam R The type of the task function
+ *
+ * \tparam Args The argument types for the task function
+ */
+template <typename R, typename... Args>
+using packaged_task = std::packaged_task<R, Args...>;
 
 }   // end qlib namespace
 

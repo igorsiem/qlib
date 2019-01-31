@@ -176,7 +176,7 @@ class thread_pool final
         // Package the task for executing
         using return_t = typename std::result_of<F(Args...)>::type;
 
-        auto task = std::make_shared<std::packaged_task<return_t(void)> >(
+        auto task = std::make_shared<packaged_task<return_t(void)> >(
             std::bind(std::forward<F>(fn), std::forward<Args>(args)...));
 
         future<return_t> result = task->get_future();
