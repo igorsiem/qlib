@@ -13,6 +13,7 @@ project(qLib LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package (Threads)
+FIND_PACKAGE(Boost COMPONENTS program_options thread system REQUIRED)
 
 include_directories(
     .
@@ -27,5 +28,7 @@ file (GLOB TEST_SRC test/*.cpp)
 add_executable(test-qlib ${TEST_SRC})
 target_link_libraries(test-qlib PRIVATE
     fmt-header-only
+    boost_system
+    boost_thread
     ${CMAKE_THREAD_LIBS_INIT}
 )

@@ -12,6 +12,7 @@
 #include "default_decs.h"
 #include "logger.h"
 #include "strutils.h"
+#include "thread.h"
 #include "thread_pool.h"
 
 /**
