@@ -37,6 +37,8 @@ TEST_CASE("thread_pool", "[unit]")
         REQUIRE(r2.valid());
         REQUIRE(r3.valid());
 
+        boost::wait_for_all(r1, r2, r3);
+
         // Check the results from the futures we got before
         r1.get();
         REQUIRE(test_flag == true);
@@ -56,5 +58,22 @@ TEST_CASE("thread_pool", "[unit]")
         REQUIRE_NOTHROW(result.wait());
         REQUIRE_THROWS_AS(result.get(), std::runtime_error);
     }
+
+    // Verify behaviour of Boost 'wait_for_all'
+    SECTION("verify wait_for_all behaviour")
+    {
+        using int_future_t = qlib::future<int>;
+        std::vector<int_future_t> results;
+
+        for (int i = 0; i < 100; i++)
+        {
+            results.emplace_back(tp.enqueue([i](void) { return i; }));
+        }
+
+        boost::wait_for_all(results.begin(), results.end());
+
+        for (int i = 0; i < 100; i++)
+            { REQUIRE(results[i].get() == i); }
+    }   // end wait_for_all section
 
 }   // end thread pool test

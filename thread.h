@@ -9,8 +9,8 @@
  * or copy at https://www.boost.org/LICENSE_1_0.txt
  */
 
-#include <future>
-#include <shared_mutex>
+#define BOOST_THREAD_PROVIDES_FUTURE
+#include <boost/thread.hpp>
 
 #ifndef _qlib_thread_h_included
 #define _qlib_thread_h_included
@@ -20,39 +20,39 @@ namespace qlib {
 /**
  * \brief The main qLib mutex type
  */
-using shared_mutex = std::shared_mutex;
+using shared_mutex = boost::shared_mutex;
 
 /**
  * \brief A non-exclusive lock for reading a resource
  */
-using write_lock = std::unique_lock<shared_mutex>;
+using write_lock = boost::unique_lock<shared_mutex>;
 
 /**
  * \brief An exclusive lock for writing to a resource
  */
-using read_lock = std::shared_lock<shared_mutex>;
+using read_lock = boost::shared_lock<shared_mutex>;
 
 /**
  * \brief A standard (non-shared) mutex
  */
-using mutex = std::mutex;
+using mutex = boost::mutex;
 
 /**
  * \brief A standard lock guard on a standard mutex
  */
-using lock = std::unique_lock<mutex>;
+using lock = boost::unique_lock<mutex>;
 
 /**
  * \brief The condition variable type used by qLib
  */
-using condition_variable = std::condition_variable;
+using condition_variable = boost::condition_variable;
 
 /**
  * \brief Asynchronous future type used by qLib
  *
  * \tparam The return type of the future (returned by the `get` method)
  */
-template <typename T> using future = std::future<T>;
+template <typename R> using future = boost::future<R>;
 
 /**
  * \brief Packaged task type used by qLib
@@ -62,7 +62,12 @@ template <typename T> using future = std::future<T>;
  * \tparam Args The argument types for the task function
  */
 template <typename R, typename... Args>
-using packaged_task = std::packaged_task<R, Args...>;
+using packaged_task = boost::packaged_task<R, Args...>;
+
+/**
+ * \brief The thread type used by qLib
+ */
+using thread = boost::thread;
 
 }   // end qlib namespace
 

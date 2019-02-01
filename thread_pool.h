@@ -9,11 +9,8 @@
  * or copy at https://www.boost.org/LICENSE_1_0.txt
  */
 
-#include <condition_variable>
 #include <functional>
-#include <future>
 #include <memory>
-#include <mutex>
 #include <queue>
 #include <stdexcept>
 #include <vector>
@@ -53,17 +50,21 @@ namespace qlib {
  * // The first one sets an external falg
  * bool test_flag = false;
  * auto result1 = tp.enqueue([&test_flag]() { test_flag = true; });
+ *     // result1 is type qlib::future<void>
  *
  * // The second task takes no arguments, but returns a result
  * auto result2 = tp.enqueue([]() { return std::string("abc"); });
+ *     // result2 is type qlib::future<std::string>
  *
  * // This task uses a predefined lambda that adds two integers. Note that
  * // the call to enqueue the task takes the arguments as well.
  * auto my_fn = [](int a, int b) { return a+b; };
  * auto result3 = tp.enqueue(my_fn, 2, 3);
+ *     // result3 is type qlib::future<int>
  *
  * // This task throws an exception!
  * auto result4 = tp.enqueue([]() { throw std::runtime_error("test"); });
+ *     // result4 is type qlib::future<void>
  *
  * // Four tasks now being executed...
  *
@@ -77,6 +78,8 @@ namespace qlib {
  * // task.
  * result4.get();
  * \endcode
+ *
+ * \todo Continuations have not been tested with the new Boost futures
  */
 class thread_pool final
 {
@@ -94,7 +97,7 @@ class thread_pool final
      * (defaults to the available hardware concurrency)
      */
     explicit thread_pool(
-            std::size_t num_threads = std::thread::hardware_concurrency()) :
+            std::size_t num_threads = thread::hardware_concurrency()) :
         m_workers()
         , m_tasks()
         , m_tasks_mtx()
@@ -166,8 +169,8 @@ class thread_pool final
      *
      * \param args The arguments to the enqueued function
      *
-     * \return A `std::future` object that can be used to obtain the
-     * result of `fn`, or access any exception thrown
+     * \return A `future` object that can be used to obtain the result of
+     * `fn`, or access any exception thrown
      */
     template <typename F, typename... Args>
     auto enqueue(F&& fn, Args&&... args)
@@ -176,7 +179,7 @@ class thread_pool final
         // Package the task for executing
         using return_t = typename std::result_of<F(Args...)>::type;
 
-        auto task = std::make_shared<packaged_task<return_t(void)> >(
+        auto task = std::make_shared<packaged_task<return_t> >(
             std::bind(std::forward<F>(fn), std::forward<Args>(args)...));
 
         future<return_t> result = task->get_future();
@@ -201,7 +204,7 @@ class thread_pool final
     /**
      * \brief The collection of thread objects
      */
-    std::vector<std::thread> m_workers;
+    std::vector<thread> m_workers;
 
     /**
      * \brief The queue of tasks
