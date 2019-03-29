@@ -15,8 +15,9 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package (Threads)
 
-# set(CMAKE_MODULE_PATH .)
+# Using conan for dependencies
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
 # --- Boost Info ---
 # message("Boost:")
@@ -24,24 +25,15 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 # message("    includes : ${CONAN_INCLUDE_DIRS_BOOST}")
 # message("    libs     : ${CONAN_LIB_DIRS_BOOST}")
 
-add_definitions(${CONAN_DEFINES_BOOST})
-
 include_directories(
     .
     third-party
-    third-party/fmt/include
-    ${CONAN_INCLUDE_DIRS_BOOST}
 )
-
-link_directories(${CONAN_LIB_DIRS_BOOST})
-
-add_subdirectory(third-party/fmt EXCLUDE_FROM_ALL)
 
 # The test executable
 file (GLOB TEST_SRC test/*.cpp)
 add_executable(test-qlib ${TEST_SRC})
 target_link_libraries(test-qlib PRIVATE
-    ${CONAN_LIBS_BOOST}
-    fmt-header-only
+    ${CONAN_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
 )

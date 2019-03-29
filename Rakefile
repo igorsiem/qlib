@@ -43,13 +43,9 @@ desc "run cmake to produce platform-specific build files"
 task :cmake => :conan do
     Dir.chdir "build"
 
-    cmake_cmd = "cmake " +
-                ###"-DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake " +
-                ""
-
+    cmake_cmd = "cmake "
     cmake_cmd += "-G \"Visual Studio 15 2017 Win64\" " \
         if Rake::Win32::windows?
-
     cmake_cmd += ".."
 
     sh cmake_cmd
@@ -76,11 +72,7 @@ end
 
 desc "run test suite"
 task :test => :bin do
-    test_cmd = "build"
-    test_cmd += "/Release" if Rake::Win32::windows?
-    test_cmd += "/test-qlib"
-
-    sh test_cmd
+    sh "build/bin/test-#{$project_name}"
 end
 
 
@@ -90,3 +82,8 @@ desc "build doxygen docs"
 task :docs => "build/docs" do
     sh "doxygen"
 end
+
+desc "build tests, run tests and build docs"
+task :all => [:bin, :test, :docs]
+
+task :default => :all
