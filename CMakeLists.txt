@@ -19,15 +19,9 @@ find_package (Threads)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-# --- Boost Info ---
-# message("Boost:")
-# message("    root     : ${CONAN_BOOST_ROOT}")
-# message("    includes : ${CONAN_INCLUDE_DIRS_BOOST}")
-# message("    libs     : ${CONAN_LIB_DIRS_BOOST}")
-
 include_directories(
     .
-    third-party
+    ###third-party
 )
 
 # The test executable
