@@ -21,6 +21,17 @@ task :clean do
     FileUtils.rm_rf "build"
 end
 
+namespace :conan do
+
+    desc "build the Boost libraries with conan"
+    task :build_boost => "build" do
+        Dir.chdir "build"
+        sh "conan install .. --build boost"
+        Dir.chdir ".."
+        end
+end
+
+
 desc "run conan to install / generate dependencies"
 task :conan => "build" do
     Dir.chdir "build"
@@ -33,7 +44,8 @@ task :cmake => :conan do
     Dir.chdir "build"
 
     cmake_cmd = "cmake " +
-                "-DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake "
+                ###"-DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake " +
+                ""
 
     cmake_cmd += "-G \"Visual Studio 15 2017 Win64\" " \
         if Rake::Win32::windows?
