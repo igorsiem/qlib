@@ -10,7 +10,6 @@
 
 cmake_minimum_required(VERSION 3.10)
 project(qLib LANGUAGES CXX)
-# set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package (Threads)
@@ -18,11 +17,6 @@ find_package (Threads)
 # Using conan for dependencies
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
-
-include_directories(
-    .
-    ###third-party
-)
 
 # The test executable
 file (GLOB TEST_SRC test/*.cpp)
