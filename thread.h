@@ -58,11 +58,9 @@ template <typename R> using future = boost::future<R>;
  * \brief Packaged task type used by qLib
  *
  * \tparam R The type of the task function
- *
- * \tparam Args The argument types for the task function
  */
-template <typename R, typename... Args>
-using packaged_task = boost::packaged_task<R, Args...>;
+template <typename R>
+using packaged_task = boost::packaged_task<R>;
 
 /**
  * \brief The thread type used by qLib

@@ -9,7 +9,7 @@
  * or copy at https://www.boost.org/LICENSE_1_0.txt
  */
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 #include "../logger.h"
 
 // Simple test of the logger - note that logging can be observed in the
@@ -22,28 +22,28 @@ TEST_CASE("logger", "[unit]")
     // Un-comment these lines to output test log messages
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::error,
-    //     L"a wide-string error");
+    //     L"wide-string error");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::warning,
-    //     L"a wide-string warning");
+    //     L"wide-string warning");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::info,
     //     L"wide-string information");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::debug,
-    //     L"wide-string debugging");
+    //     L"wide-string debugging message");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::error,
-    //     "a standard string error");
+    //     "standard string error");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::warning,
-    //     "a standard string warning");
+    //     "standard string warning");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::info,
     //     "standard string information");
     // qlib::logger::instance().log(
     //     qlib::logger::level_t::debug,
-    //     "standard string debugging");
+    //     "standard string debugging message");
 
     REQUIRE_NOTHROW(qlib::logger::instance().clear());
 

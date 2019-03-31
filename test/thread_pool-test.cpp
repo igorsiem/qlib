@@ -9,7 +9,7 @@
  * or copy at https://www.boost.org/LICENSE_1_0.txt
  */
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 #include "../thread_pool.h"
 
 // Some simple thread pool tests - queueing up several tasks of different
