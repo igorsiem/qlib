@@ -10,25 +10,18 @@
 
 cmake_minimum_required(VERSION 3.10)
 project(qLib LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package (Threads)
-FIND_PACKAGE(Boost COMPONENTS program_options thread system REQUIRED)
 
-include_directories(
-    .
-    third-party
-    third-party/fmt/include
-)
-
-add_subdirectory(third-party/fmt EXCLUDE_FROM_ALL)
+# Using conan for dependencies
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
 # The test executable
 file (GLOB TEST_SRC test/*.cpp)
 add_executable(test-qlib ${TEST_SRC})
 target_link_libraries(test-qlib PRIVATE
-    fmt-header-only
-    boost_system
-    boost_thread
+    ${CONAN_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
 )
