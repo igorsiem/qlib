@@ -49,7 +49,6 @@ task :test => :bin do
     sh "build/bin/test-#{$project_name}"
 end
 
-
 directory "build/docs"
 
 desc "build doxygen docs"
@@ -61,3 +60,37 @@ desc "build tests, run tests and build docs"
 task :all => [:bin, :test, :docs]
 
 task :default => :all
+
+# Retrieve the location a conan dependency
+def get_location(dep)
+
+    cmd_str = "conan info #{dep} " +
+        "--paths --only package_folder " +
+        ""
+
+    resp_str = `#{cmd_str}`
+
+    resp_str.lines.each do |line|
+        return line.split(": ")[1].strip if line.include?("package_folder")
+    end
+
+end
+
+namespace :loc do
+
+    desc "retrieve location of Boost library (from conan)"
+    task :boost do
+        puts get_location("boost/1.69.0@conan/stable")
+    end
+
+    desc "retrieve location of fmr library (from conan)"
+    task :fmt do
+        puts get_location("fmt/5.3.0@bincrafters/stable")
+    end
+
+    desc "retrieve location of Catch2 library (from conan)"
+    task :catch2 do
+        puts get_location("Catch2/2.7.0@catchorg/stable")
+    end
+
+end
