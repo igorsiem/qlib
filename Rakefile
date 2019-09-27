@@ -21,35 +21,17 @@ task :clean do
     FileUtils.rm_rf "build"
 end
 
-namespace :conan do
-
-    desc "build the Boost libraries with conan"
-    task :build_boost => "build" do
-        Dir.chdir "build"
-        sh "conan install .. --build boost"
-        Dir.chdir ".."
-        end
-end
-
-
 desc "run conan to install / generate dependencies"
 task :conan => "build" do
     Dir.chdir "build"
-    sh "conan install .."
+    sh "conan install .. --build=missing"
     Dir.chdir ".."
 end
 
 desc "run cmake to produce platform-specific build files"
 task :cmake => :conan do
     Dir.chdir "build"
-
-    cmake_cmd = "cmake "
-    cmake_cmd += "-G \"Visual Studio 15 2017 Win64\" " \
-        if Rake::Win32::windows?
-    cmake_cmd += ".."
-
-    sh cmake_cmd
-
+    sh "cmake .."
     Dir.chdir ".."
 end
 
@@ -57,15 +39,7 @@ desc "build binaries"
 task :bin => :cmake do    
     Dir.chdir "build"
 
-    make_cmd = "make -j8"
-
-    make_cmd =
-            "msbuild /m #{$project_name}.sln " +
-            "/p:Configuration=Release " +
-            "/p:Platform=\"x64\" " +
-            "" if Rake::Win32::windows?
-
-    sh make_cmd
+    sh "cmake --build . --config Release"
 
     Dir.chdir ".."
 end
@@ -74,7 +48,6 @@ desc "run test suite"
 task :test => :bin do
     sh "build/bin/test-#{$project_name}"
 end
-
 
 directory "build/docs"
 
@@ -87,3 +60,37 @@ desc "build tests, run tests and build docs"
 task :all => [:bin, :test, :docs]
 
 task :default => :all
+
+# Retrieve the location a conan dependency
+def get_location(dep)
+
+    cmd_str = "conan info #{dep} " +
+        "--paths --only package_folder " +
+        ""
+
+    resp_str = `#{cmd_str}`
+
+    resp_str.lines.each do |line|
+        return line.split(": ")[1].strip if line.include?("package_folder")
+    end
+
+end
+
+namespace :loc do
+
+    desc "retrieve location of Boost library (from conan)"
+    task :boost do
+        puts get_location("boost/1.69.0@conan/stable")
+    end
+
+    desc "retrieve location of fmr library (from conan)"
+    task :fmt do
+        puts get_location("fmt/5.3.0@bincrafters/stable")
+    end
+
+    desc "retrieve location of Catch2 library (from conan)"
+    task :catch2 do
+        puts get_location("Catch2/2.7.0@catchorg/stable")
+    end
+
+end

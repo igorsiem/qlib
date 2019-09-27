@@ -24,9 +24,6 @@
 #ifndef _qlib_logger_h_included
 #define _qlib_logger_h_included
 
-/**
- * \brief A namespace qLib-related declarations and functionality
- */
 namespace qlib
 {
 
