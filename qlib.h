@@ -25,3 +25,11 @@
  * Software License, Version 1.0. (See accompanying file LICENSE_1_0.txt or
  * copy at https://www.boost.org/LICENSE_1_0.txt
  */
+
+/**
+ * \brief A namespace qLib-related declarations and functionality
+ */
+namespace qlib
+{
+    static const char* version = "0.1.4";
+}   // end qlib namespace
