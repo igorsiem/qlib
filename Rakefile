@@ -21,35 +21,17 @@ task :clean do
     FileUtils.rm_rf "build"
 end
 
-namespace :conan do
-
-    desc "build the Boost libraries with conan"
-    task :build_boost => "build" do
-        Dir.chdir "build"
-        sh "conan install .. --build boost"
-        Dir.chdir ".."
-        end
-end
-
-
 desc "run conan to install / generate dependencies"
 task :conan => "build" do
     Dir.chdir "build"
-    sh "conan install .."
+    sh "conan install .. --build=missing"
     Dir.chdir ".."
 end
 
 desc "run cmake to produce platform-specific build files"
 task :cmake => :conan do
     Dir.chdir "build"
-
-    cmake_cmd = "cmake "
-    cmake_cmd += "-G \"Visual Studio 15 2017 Win64\" " \
-        if Rake::Win32::windows?
-    cmake_cmd += ".."
-
-    sh cmake_cmd
-
+    sh "cmake .."
     Dir.chdir ".."
 end
 
@@ -57,15 +39,7 @@ desc "build binaries"
 task :bin => :cmake do    
     Dir.chdir "build"
 
-    make_cmd = "make -j8"
-
-    make_cmd =
-            "msbuild /m #{$project_name}.sln " +
-            "/p:Configuration=Release " +
-            "/p:Platform=\"x64\" " +
-            "" if Rake::Win32::windows?
-
-    sh make_cmd
+    sh "cmake --build . --config Release"
 
     Dir.chdir ".."
 end
