@@ -34,3 +34,6 @@
 # Cmake artefacts
 build/
 .vscode/
+
+# Python
+venv/
