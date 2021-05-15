@@ -115,7 +115,7 @@ def show_include_paths():
     """Retrieve the conan package paths to use in include files
     """
     cmd = "conan info --paths --only package_folder ."
-    result = subprocess.run(cmd, stdout=subprocess.PIPE).stdout.decode()
+    result = subprocess.run(cmd.split(' '), stdout=subprocess.PIPE).stdout.decode()
 
     for line in result.split('\n'):
         if ':' in line:
