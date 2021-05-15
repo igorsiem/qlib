@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 from pathlib import Path
+import subprocess
 
 # --- Config ---
 project_name = 'qlib'
@@ -110,14 +111,36 @@ def run_tests():
     if error != 0:
         raise RuntimeError("running tests returned exit code {}".format(error))
 
+def show_include_paths():
+    """Retrieve the conan package paths to use in include files
+    """
+    cmd = "conan info --paths --only package_folder ."
+    result = subprocess.run(cmd.split(' '), stdout=subprocess.PIPE).stdout.decode()
+
+    for line in result.split('\n'):
+        if ':' in line:
+            print("\"{}/**\",".format(line.split(': ')[1].strip().replace('\\', '/')))
+
 # Parse command line and execute
-parser = argparse.ArgumentParser(description='Lightweight make / build tool')
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description="""
+Lightweight make / build tool"
+
+Any number of targets may be requested.
+
+    clean       Clean the build directory
+    conan       Run conan installation
+    cmake       Run cmake to create build files (runs 'conan')
+    build       Build the binaries (runs 'cmake')
+    test        Run the test binary (runs 'build')
+    includes    Retrieve the locations of conan packages for the include list in vscode
+""")
 parser.add_argument('targets',
     metavar='T',
     nargs='+',
-    help='target(s) to make; main targets are "clean", "build", and "test"')
+    help='target(s) to make')
 args = parser.parse_args()
-print(args)
 
 for t in args.targets:
     if t == 'clean':
@@ -136,5 +159,7 @@ for t in args.targets:
         run_cmake()
         build_binaries()
         run_tests()
+    elif t == 'includes':
+        show_include_paths()
     else:
         raise argparse.ArgumentError(None, "unrecognised target '{}'".format(t))
