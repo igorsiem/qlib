@@ -10,7 +10,6 @@
  */
 
 #include <string>
-#include <codecvt>
 #include <boost/lexical_cast.hpp>
 
 #ifndef _qlib_strutils_h_included
@@ -22,7 +21,7 @@ namespace boost {
  * \brief Convert a wide string to a string, as an extension to Boost's
  * `lexical_cast` system
  * 
- * Usig [this simple fix](https://dbj.org/c17-codecvt-deprecated-panic/) for
+ * Using [this simple fix](https://dbj.org/c17-codecvt-deprecated-panic/) for
  * the deprecation of the codecvt header that we were using before.
  * 
  * \param arg The wide string to convert
@@ -32,10 +31,19 @@ namespace boost {
 template<>
 inline std::string lexical_cast(const std::wstring& arg)
 {
-    ///std::wstring_convert<deletable_facet<convert_type> > string_converter;
-    ///return string_converter.to_bytes(arg);
-    if (arg.empty()) return {};
-    return { std::begin(arg), std::end(arg) };
+    std::string str;
+    if (!arg.empty())
+    {
+        // Execute a simple old-school character-truncating transform, because codecvt is
+        // deprecated in this case.
+        std::transform(arg.begin(), arg.end(), std::back_inserter(str), [] (wchar_t c)
+        {
+            return (char)c;
+        });
+    }
+
+    return str;
+
 }   // end lexical cast
 
 /**
