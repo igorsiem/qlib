@@ -12,10 +12,6 @@ cmake_minimum_required(VERSION 3.10)
 project(qLib LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
-# Using deprecated codecvt header until a suitable replacement for its
-# capability is available - see GitHub issue #9
-add_definitions(-D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-
 find_package (Threads)
 
 # Using conan for dependencies

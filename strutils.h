@@ -10,7 +10,6 @@
  */
 
 #include <string>
-#include <codecvt>
 #include <boost/lexical_cast.hpp>
 
 #ifndef _qlib_strutils_h_included
@@ -18,32 +17,12 @@
 
 namespace boost {
 
-/// \cond
-//
-// The following declarations are some internal type manipulations to
-// support the lexical cast operations
-namespace qlib_internal {
-
-using convert_type = std::codecvt<wchar_t, char, mbstate_t>;
-
-template <class facet_base>
-struct deletable_facet : public facet_base
-{
-    template <class ...arg_types>
-    deletable_facet(arg_types&& ...args) :
-        facet_base(std::forward<arg_types>(args)...) {}
-        
-    virtual ~deletable_facet(void) {}
-};
-
-}
-/// \endcond
-
-using namespace qlib_internal;
-
 /**
  * \brief Convert a wide string to a string, as an extension to Boost's
  * `lexical_cast` system
+ * 
+ * Using [this simple fix](https://dbj.org/c17-codecvt-deprecated-panic/) for
+ * the deprecation of the codecvt header that we were using before.
  * 
  * \param arg The wide string to convert
  * 
@@ -52,13 +31,27 @@ using namespace qlib_internal;
 template<>
 inline std::string lexical_cast(const std::wstring& arg)
 {
-    std::wstring_convert<deletable_facet<convert_type> > string_converter;
-    return string_converter.to_bytes(arg);
+    std::string str;
+    if (!arg.empty())
+    {
+        // Execute a simple old-school character-truncating transform, because codecvt is
+        // deprecated in this case.
+        std::transform(arg.begin(), arg.end(), std::back_inserter(str), [] (wchar_t c)
+        {
+            return (char)c;
+        });
+    }
+
+    return str;
+
 }   // end lexical cast
 
 /**
  * \brief Convert a string to a wide string, as an extension to Boost's
  * `lexical_cast` system
+ * 
+ * Usig [this simple fix](https://dbj.org/c17-codecvt-deprecated-panic/) for
+ * the deprecation of the codecvt header that we were using before.
  * 
  * \param arg The string to convert
  * 
@@ -67,8 +60,10 @@ inline std::string lexical_cast(const std::wstring& arg)
 template<>
 inline std::wstring lexical_cast(const std::string& arg)
 {
-    std::wstring_convert<deletable_facet<convert_type> > string_converter;
-    return string_converter.from_bytes(arg);
+    ///std::wstring_convert<deletable_facet<convert_type> > string_converter;
+    ///return string_converter.from_bytes(arg);
+    if (arg.empty()) return {};
+    return { std::begin(arg), std::end(arg) };
 }   // end lexical cast
 
 }   // end boost namespace
